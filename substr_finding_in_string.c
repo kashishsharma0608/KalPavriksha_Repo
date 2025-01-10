@@ -2,13 +2,12 @@
 #include <stdlib.h>
 int length_of_string(char *string)
 {
-	int count = 0, index = 0;
+	int index = 0;
 	while (string[index] != '\0')
 	{
-		count++;
 		index++;
 	}
-	return count;
+	return index;
 }
 int main()
 {
@@ -67,15 +66,10 @@ int main()
 
 				if (match_flag_counter == substr_length)
 				{
-					match_flag = 1;
+					printf("%s ", strings[row_index][column_index]);
+				        match_count++;
 					break;
 				}
-			}
-
-			if (match_flag)
-			{
-				printf("%s\n", strings[row_index][column_index]);
-				match_count++;
 			}
 		}
 		printf("\n");
