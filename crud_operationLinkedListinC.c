@@ -5,205 +5,141 @@ struct Node
     int data;
     struct Node *next;
 };
-struct Node *start = NULL;
-void insertAtBeginning(int information)
+struct Node *createNode(int data)
 {
-    struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
-    newnode->data = information;
-    newnode->next = NULL;
-    if (start == NULL)
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    if (!newNode)
     {
-        start = newnode;
+        printf("Memory allocation failed.\n");
+        return NULL;
     }
-    else
-    {
-        newnode->next = start;
-        start = newnode;
-    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
 }
-void insertionAtPosition(int information, int position)
+void insertNode(struct Node **start, int data, int position)
 {
-    struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
-    newnode->data = information;
-    newnode->next = NULL;
-    if (start == NULL)
+    struct Node *newNode = createNode(data);
+    if (position == 1 || *start == NULL)
     {
-        start = newnode;
+        newNode->next = *start;
+        *start = newNode;
+        return;
     }
-    else
+    struct Node *current = *start;
+    while (position > 2 && current->next != NULL)
     {
-        struct Node *ptr = start;
-        int i;
-        if (position == 1)
-        {
-            insertAtBeginning(information);
-        }
-        else
-        {
-            for (i = 1; i < position - 1; i++)
-            {
-                if (ptr == NULL)
-                {
-                    break;
-                }
-                ptr = ptr->next;
-            }
-            if (i == position - 1)
-            {
-                newnode->next = ptr->next;
-                ptr->next = newnode;
-            }
-            else
-            {
-                printf("Invalid position");
-            }
-        }
+        current = current->next;
+        position--;
     }
+    if (position > 2)
+    {
+        printf("Invalid Position");
+        free(newNode);
+        return;
+    }
+    newNode->next = current->next;
+    current->next = newNode;
 }
-void insertAtEnd(int information)
+void deleteNode(struct Node **start, int position)
 {
-    struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
-    newnode->data = information;
-    newnode->next = NULL;
-    if (start == NULL)
+    if (*start == NULL)
     {
-        start = newnode;
+        printf("Linked list is empty.\n");
+        return;
     }
-    else
+    struct Node *temp;
+    if (position == 1)
     {
-        struct Node *ptr = start;
-        while (ptr->next != NULL)
-        {
-            ptr = ptr->next;
-        }
-        ptr->next = newnode;
+        temp = *start;
+        *start = (*start)->next;
+        free(temp);
+        return;
     }
-}
-void deleteAtBeginning()
-{
-    if (start == NULL)
+    struct Node *current = *start;
+    while (position > 2 && current->next != NULL)
     {
-        printf("Linked list empty");
+        current = current->next;
+        position--;
     }
-    else
-    {
-        struct Node *ptr = start;
-        start = ptr->next;
-        free(ptr);
-    }
-}
-void deleteAtEnd()
-{
-    if (start == NULL)
-    {
-        printf("linked list is empty");
-    }
-    else
-    {
-        struct Node *prev = NULL;
-        struct Node *ptr = start;
-        while (ptr->next != NULL)
-        {
-            prev = ptr;
-            ptr = ptr->next;
-        }
-        prev->next = NULL;
-        free(ptr);
-    }
-}
-void deleteAtPosition(int position)
-{
-    if (start == NULL)
-    {
-        printf("linked list empty");
-    }
-    else
-    {
-        struct Node *ptr = start;
-        if (position == 1 && start->next == NULL)
-        {
-            deleteAtBeginning();
-        }
-        else if (position == 1)
-        {
-            deleteAtBeginning();
-        }
-        else
-        {
-            int i;
-            for (i = 1; i < position; i++)
-            {
-                if (ptr == NULL)
-                {
-                    break;
-                }
-                ptr = ptr->next;
-            }
-            if (i == position)
-            {
-                struct Node *current = NULL;
-                current = ptr->next;
-                ptr->next = current->next;
-                free(current);
-            }
-            else
-            {
-                printf("Invalid");
-            }
-        }
-    }
-}
-void updateAtPosition(int position, int newdata)
-{
-    if (start == NULL)
-    {
-        struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
-        newnode->data = newdata;
-        newnode->next = NULL;
-        start = newnode;
-    }
-    else
-    {
-        int i;
 
-        struct Node *ptr = start;
-        for (i = 1; i < position; i++)
-        {
-
-            ptr = ptr->next;
-        }
-        if (i == position)
-        {
-            ptr->data = newdata;
-        }
-        else
-        {
-            printf("Invalid");
-        }
-    }
-}
-void display()
-{
-    printf("\nThe Linked List is : \t\t\t");
-    struct Node *ptr = start;
-    ptr = start;
-    while (ptr != NULL)
+    if (current->next == NULL)
     {
-        printf("%d->", ptr->data);
-        ptr = ptr->next;
+        printf("Invalid position.\n");
+        return;
+    }
+
+    temp = current->next;
+    current->next = temp->next;
+    free(temp);
+}
+void updateNode(struct Node *start, int position, int newData)
+{
+    if (start == NULL)
+    {
+        printf("Linked list is empty.\n");
+        return;
+    }
+
+    struct Node *current = start;
+    while (position > 1 && current != NULL)
+    {
+        current = current->next;
+        position--;
+    }
+
+    if (current == NULL||position>1)
+    {
+        printf("Invalid position.\n");
+        return;
+    }
+
+    current->data = newData;
+}
+void displayList(struct Node *start)
+{
+    if (start == NULL)
+    {
+        printf("Linked list is empty.\n");
+        return;
+    }
+
+    printf("The Linked List is: ");
+    while (start != NULL)
+    {
+        printf("%d -> ", start->data);
+        start = start->next;
     }
     printf("NULL\n");
 }
+void freeList(struct Node **start)
+{
+    struct Node *current = *start;
+    struct Node *nextNode;
+    while (current != NULL)
+    {
+        nextNode = current->next;
+        free(current);
+        current = nextNode;
+    }
+    *start = NULL;
+}
+
 int main()
 {
-    struct Node *start = NULL, *current = NULL;
-    int num;
-    printf("Enter the number of operation you want to perform:");
-    scanf("%d", &num);
-    for (int i = 0; i < num; i++)
+    struct Node *start = NULL;
+    int numberOfOperations;
+
+    printf("Enter the number of operations you want to perform: ");
+    scanf("%d", &numberOfOperations);
+    if(!(numberOfOperations>=1&&numberOfOperations<=100)){
+        printf("Wrong input for number of operation must be between 1 to 100.");
+        return 0;
+    }
+    for (int iterator = 0; iterator < numberOfOperations; iterator++)
     {
         int choice;
-        printf("\n1.Insert at beginning\n2. Insert at position\n3. Insert at end\n4. Delete at beginning\n5. Delete at end\n6. Delete at a position\n7. Update At a position.\n8. Display");
+        printf("\n1. Insert at beginning\n2. Insert at position\n3. Insert at end\n4. Delete at beginning\n5. Delete at end\n6. Delete at a position\n7. Update At a position.\n8. Display");
         printf("\nEnter a choice:   ");
         scanf("%d", &choice);
         if (choice == 1)
@@ -211,7 +147,7 @@ int main()
             int information;
             printf("\nEnter the data to be inserted");
             scanf("%d", &information);
-            insertAtBeginning(information);
+            insertNode(&start, information, 1);
         }
         else if (choice == 2)
         {
@@ -220,47 +156,60 @@ int main()
             scanf("%d", &information);
             printf("\nEnter the position:");
             scanf("%d", &position);
-            insertionAtPosition(information, position);
+            insertNode(&start, information, position);
         }
         else if (choice == 3)
         {
             int information;
             printf("\nEnter the data to be inserted");
             scanf("%d", &information);
-            insertAtEnd(information);
+            int position = 1;
+            struct Node *pointer = start;
+            while (pointer != NULL)
+            {
+                position++;
+                pointer = pointer->next;
+            }
+            insertNode(&start, information, position);
         }
         else if (choice == 4)
         {
-            deleteAtBeginning();
+            deleteNode(&start, 1);
         }
         else if (choice == 5)
         {
-            deleteAtEnd();
+            int position = 0;
+            struct Node *pointer = start;
+            while (pointer != NULL)
+            {
+                position++;
+                pointer = pointer->next;
+            }
+            deleteNode(&start, position);
         }
         else if (choice == 6)
         {
             int position;
             printf("\nEnter the Position to delete:");
             scanf("%d", &position);
-            deleteAtPosition(position);
+            deleteNode(&start, position);
         }
         else if (choice == 7)
         {
-            int position, newdata;
+            int position, newData;
             printf("\nEnter the position to be updated:");
             scanf("%d", &position);
             printf("\nEnter the new data:");
-            scanf("%d", &newdata);
-            updateAtPosition(position, newdata);
+            scanf("%d", &newData);
+            updateNode(start, position, newData);
         }
         else if (choice == 8)
         {
-            display();
+            displayList(start);
         }
         else
         {
-            printf("Invalid Selection:");
-            return 0;
+            printf("Invalid Selection: Select between 1 to 8!");
         }
     }
     return 0;
