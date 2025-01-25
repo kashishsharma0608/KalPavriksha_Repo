@@ -1,62 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-int diagonal_Sum(int *matrix[], int dimensions)
+int calculateTraceOfMatrix(int *matrix[], int dimensions)
 {
-	int matrix_sum = 0;
-	for (int index = 0; index < dimensions; index++)
-	{
-		matrix_sum += matrix[index][index];
-	}
-	return matrix_sum;
+    int diagonalSum = 0;
+    for (int index = 0; index < dimensions; index++)
+    {
+        diagonalSum += matrix[index][index];
+    }
+    return diagonalSum;
 }
-bool check_trace(int sum1, int sum2)
+bool areTraceOfMatrixEqual(int sum1, int sum2)
 {
-	return sum1 == sum2;
+    return sum1 == sum2;
 }
+int **allocateMatrix(int dimensions)
+{
+    int **matrix = (int **)malloc(dimensions * sizeof(int *));
+    if (matrix == NULL)
+    {
+        printf("Memory allocation failed!\n");
+        return NULL;
+    }
+    for (int iterator = 0; iterator < dimensions; iterator++)
+    {
+        matrix[iterator] = (int *)malloc(dimensions * sizeof(int));
+        if (matrix[iterator] == NULL)
+        {
+            printf("Memory allocation failed!\n");
+            return NULL;
+        }
+    }
+    return matrix;
+}
+
+void freeMatrix(int *matrix[], int dimensions)
+{
+    for (int i = 0; i < dimensions; i++)
+    {
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
+void inputMatrixElements(int *matrix[], int dimensions)
+{
+    for (int row = 0; row < dimensions; row++)
+    {
+        for (int column = 0; column < dimensions; column++)
+        {
+            scanf("%d", &matrix[row][column]);
+        }
+    }
+}
+
 int main()
 {
-	int dimensions;
-	printf("Enter the dimension of the square matrix:");
-	scanf("%d", &dimensions);
-	int *matrix1[dimensions];
-	int *matrix2[dimensions];
-	for (int index = 0; index < dimensions; index++)
-	{
-		matrix1[index] = (int *)malloc(dimensions * sizeof(int));
-		matrix2[index] = (int *)malloc(dimensions * sizeof(int));
-	}
-	printf("Enter the elements in matrix 1:");
-	for (int index = 0; index < dimensions; index++)
-	{
-		for (int index_col = 0; index_col < dimensions; index_col++)
-		{
-			scanf("%d", &matrix1[index][index_col]);
-		}
-	}
-	printf("Enter the elements in matrix 2:");
-	for (int index = 0; index < dimensions; index++)
-	{
-		for (int index_col = 0; index_col < dimensions; index_col++)
-		{
-			scanf("%d", &matrix2[index][index_col]);
-		}
-	}
-	int matrix1_sum = diagonal_Sum(matrix1, dimensions);
-	int matrix2_sum = diagonal_Sum(matrix2, dimensions);
-	int result = check_trace(matrix1_sum, matrix2_sum);
-	if (result)
-	{
-		printf("The matrix are traces of each other");
-	}
-	else
-	{
-		printf("The Matrix are not trace of each other");
-	}
-	for(int index=0; index<dimensions; index++) {
-		free(matrix1[index]);
-		free(matrix2[index]);
-	}
+    int dimensions;
+    printf("Enter the dimension of the square matrix: ");
+    scanf("%d", &dimensions);
 
-	return 0;
+    if (dimensions <= 0)
+    {
+        printf("Invalid matrix dimension. The dimension must be greater than 0.\n");
+        return 0;
+    }
+
+    int **matrix1 = allocateMatrix(dimensions);
+    int **matrix2 = allocateMatrix(dimensions);
+    printf("Enter the elements in Matrix1\n");
+    inputMatrixElements(matrix1, dimensions);
+    printf("Enter the elements in Matrix2\n");
+    inputMatrixElements(matrix2, dimensions);
+    int matrix1DiagonalSum = calculateTraceOfMatrix(matrix1, dimensions);
+    int matrix2DiagonalSum = calculateTraceOfMatrix(matrix2, dimensions);
+    if (areTraceOfMatrixEqual(matrix1DiagonalSum, matrix2DiagonalSum))
+    {
+        printf("The matrices are traces of each other.\n");
+    }
+    else
+    {
+        printf("The matrices are not traces of each other.\n");
+    }
+    freeMatrix(matrix1, dimensions);
+    freeMatrix(matrix2, dimensions);
+    return 0;
 }
