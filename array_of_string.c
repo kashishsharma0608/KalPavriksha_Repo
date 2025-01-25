@@ -1,76 +1,125 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-int main()
+int allocateMemory(int rows, int columns,char *names[rows][columns])
 {
-    int rows, columns;
-    printf("Enter Rows and Columns:");
-    scanf("%d%d", &rows, &columns);
-    char ***names = (char ***)malloc(rows * sizeof(char **));
-    for (int row = 0; row < rows; row++)
+   
+    for (int iterator = 0; iterator < rows; iterator++)
     {
-        names[row] = (char **)malloc(columns * sizeof(char *));
-        for (int cols = 0; cols < columns; cols++)
+        for (int iterator2 = 0; iterator2 < columns; iterator2++)
         {
-            names[row][cols] = (char *)malloc(100 * sizeof(char));
+            names[iterator][iterator2] = (char *)malloc(100 * sizeof(char));
+            if (names[iterator][iterator2] == NULL)
+            {
+                printf("Memory allocation failed.\n");
+                return 0;
+            }
         }
     }
-
+    return 1;
+}
+void inputNames(int rows, int columns,char *names[rows][columns])
+{
     for (int row = 0; row < rows; row++)
     {
-        for (int cols = 0; cols < columns; cols++)
+        for (int column = 0; column < columns; column++)
         {
-            printf("Enter name for row %d, column %d: ", row, cols);
-            scanf("%s", names[row][cols]);
+            printf("Enter name for row %d, column %d: ", row, column);
+            scanf("%s", names[row][column]);
         }
     }
-    printf("The Names are :\n");
+}
+void printNames(int rows, int columns,char *names[rows][columns])
+{
+    printf("The Names are:\n");
     for (int row = 0; row < rows; row++)
     {
-        for (int cols = 0; cols < columns; cols++)
+        for (int column = 0; column < columns; column++)
         {
-            printf("%s ", names[row][cols]);
+            printf("%s ", names[row][column]);
         }
         printf("\n");
     }
-    char *longest_name = (char *)malloc(100 * sizeof(char));
-    int maxlength = 0;
-    for (int index = 0; index < rows; index++)
-    {
-        for (int index2 = 0; index2 < columns; index2++)
-        {
-            if (strlen(names[index][index2]) > maxlength)
-            {
-                maxlength = strlen(names[index][index2]);
-                longest_name = names[index][index2];
-            }
-        }
-    }
-    printf("Longest Name: ");
-    printf("%s", longest_name);
-    int vowel_start_count = 0;
-    for (int index = 0; index < rows; index++)
-    {
-        for (int index2 = 0; index2 < columns; index2++)
-        {
-            char first_char = names[index][index2][0];
-            if (first_char == 'A' || first_char == 'U' || first_char == 'O' || first_char == 'I' || first_char == 'E' || first_char == 'a' || first_char == 'u' || first_char == 'o' || first_char == 'i' || first_char == 'e')
-            {
-                vowel_start_count++;
-            }
-        }
-    }
-    printf("\nNumbers of name starting with Vowels:  ");
-    printf("%d", vowel_start_count);
+}
+int isVowel(char character)
+{
+    return (character == 'A' || character == 'E' || character == 'I' || character == 'O' || character == 'U' ||
+            character == 'a' || character == 'e' || character == 'i' || character == 'o' || character == 'u');
+}
+int countNamesStartingWithVowels(int rows, int columns,char *names[rows][columns])
+{
+    int count = 0;
     for (int row = 0; row < rows; row++)
     {
-        for (int cols = 0; cols < columns; cols++)
+        for (int column = 0; column < columns; column++)
         {
-            free(names[row][cols]);
+            if (isVowel(names[row][column][0]))
+            {
+                count++;
+            }
         }
-        free(names[row]);
     }
-    free(names);
+    return count;
+}
+char *findLongestName(int rows, int columns,char *names[rows][columns])
+{
+    char *longestName = NULL;
+    int maxLength = 0;
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            int length = 0;
+            for (int stringIterator = 0; names[row][column][stringIterator] != '\0'; stringIterator++)
+            {
+                length++;
+            }
+            if (length > maxLength)
+            {
+                maxLength = length;
+                longestName = names[row][column];
+            }
+        }
+    }
+    return longestName;
+}
 
+void freeMemory(int rows, int columns,char *names[rows][columns])
+{
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            free(names[row][column]);
+        }
+
+    }
+   
+}
+int main()
+{
+    int rows, columns;
+    printf("Enter Rows and Columns: ");
+    scanf("%d%d", &rows, &columns);
+    if (rows <= 0 || columns <= 0)
+    {
+        printf("Invalid Input");
+        return 0;
+    }
+    char *names[rows][columns];
+    if(!allocateMemory(rows, columns,names)){
+        return 0;
+    }
+
+    inputNames(rows, columns,names);
+    printNames(rows, columns,names);
+
+    int vowelStartCount = countNamesStartingWithVowels(rows, columns,names);
+    printf("Number of names starting with vowels: %d\n", vowelStartCount);
+
+    char *longestName = findLongestName(rows, columns,names);
+    printf("Longest Name: %s\n", longestName);
+
+    freeMemory(rows, columns,names);
+    longestName=NULL;
     return 0;
 }
