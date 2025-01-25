@@ -1,66 +1,126 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+int stringLength(const char *string)
+{
+    int length = 0;
+    while (string[length] != '\0')
+    {
+        length++;
+    }
+    return length;
+}
+int countOccurrences(char *string, char character)
+{
+    int count = 0;
+    for (int charIndex = 0; charIndex < stringLength(string); charIndex++)
+    {
+        if (string[charIndex] == character)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+char ***allocateMemory(int numberOfRows, int numberOfColumns)
+{
+    char ***stringMatrix = (char ***)malloc(numberOfRows * sizeof(char **));
+    if (stringMatrix == NULL)
+    {
+        printf("Memory allocation failed for rows.\n");
+        return NULL;
+    }
+
+    for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++)
+    {
+        stringMatrix[rowIndex] = (char **)malloc(numberOfColumns * sizeof(char *));
+        if (stringMatrix[rowIndex] == NULL)
+        {
+            printf("Memory allocation failed for columns.\n");
+            return NULL;
+        }
+        for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
+        {
+            stringMatrix[rowIndex][columnIndex] = (char *)malloc(100 * sizeof(char));
+            if (stringMatrix[rowIndex][columnIndex] == NULL)
+            {
+                printf("Memory allocation failed for string[%d][%d].\n", rowIndex, columnIndex);
+                return NULL;
+            }
+        }
+    }
+    return stringMatrix;
+}
+void inputStrings(char ***stringMatrix, int numberOfRows, int numberOfColumns)
+{
+    printf("Enter the strings:\n");
+    for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++)
+    {
+        for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
+        {
+            scanf("%s", stringMatrix[rowIndex][columnIndex]);
+        }
+    }
+}
+char *findMaxOccurrenceString(char ***stringMatrix, int numberOfRows, int numberOfColumns, char character)
+{
+    char *resultString = NULL;
+    int maxOccurrences = 0;
+
+    for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++)
+    {
+        for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
+        {
+            int occurrenceCount = countOccurrences(stringMatrix[rowIndex][columnIndex], character);
+            if (occurrenceCount > maxOccurrences)
+            {
+                maxOccurrences = occurrenceCount;
+                resultString = stringMatrix[rowIndex][columnIndex];
+            }
+        }
+    }
+    return resultString;
+}
+void freeMemory(char ***stringMatrix, int numberOfRows, int numberOfColumns)
+{
+    for (int rowIndex = 0; rowIndex < numberOfRows; rowIndex++)
+    {
+        for (int columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
+        {
+            free(stringMatrix[rowIndex][columnIndex]);
+        }
+        free(stringMatrix[rowIndex]);
+    }
+    free(stringMatrix);
+}
+
 int main()
 {
-	int rows, columns;
-	printf(" Enter Rows and columns");
-	scanf("%d%d", &rows, &columns);
-	char ***strings = (char ***)malloc(rows * sizeof(char **));
-	for (int index = 0; index < rows; index++)
-	{
-		strings[index] = (char **)malloc(columns * sizeof(char *));
-		for (int index_col = 0; index_col < columns; index_col++)
-		{
-			strings[index][index_col] = (char *)malloc(100 * sizeof(char));
-		}
-	}
-	printf("Enter the strings:\n");
-	for (int row = 0; row < rows; row++)
-	{
-		for (int col = 0; col < columns; col++)
-		{
-			scanf("%s", strings[row][col]);
-		}
-	}
-	char ch;
-	printf("Enter a charater:");
-	scanf(" %c", &ch);
-	char *result=NULL;
-	int max_occurence = 0;
-	for (int r_index = 0; r_index < rows; r_index++)
-	{
+    int numberOfRows, numberOfColumns;
+    printf("Enter Number of Rows and Columns: ");
+    if (scanf("%d%d", &numberOfRows, &numberOfColumns) != 2 || numberOfRows <= 0 || numberOfColumns <= 0)
+    {
+        printf("Invalid input. Rows and columns must be positive integers.\n");
+        return 0;
+    }
+    char ***stringMatrix = allocateMemory(numberOfRows, numberOfColumns);
+    if (stringMatrix == NULL)
+    {
+        return 0;
+    }
+    inputStrings(stringMatrix, numberOfRows, numberOfColumns);
+    char character;
+    printf("Enter a Character: ");
+    scanf(" %c", &character);
+    char *resultString = findMaxOccurrenceString(stringMatrix, numberOfRows, numberOfColumns, character);
+    if (resultString != NULL)
+    {
+        printf("String with Most Occurrences: %s\n", resultString);
+    }
+    else
+    {
+        printf("No Occurrences Found.\n");
+    }
+    freeMemory(stringMatrix, numberOfRows, numberOfColumns);
 
-		for (int c_index = 0; c_index < columns; c_index++)
-		{
-			int count = 0;
-			int length = strlen(strings[r_index][c_index]);
-			for (int counter = 0; counter < length; counter++)
-			{
-				if (strings[r_index][c_index][counter] == ch)
-				{
-					count++;
-				}
-			}
-			if (max_occurence < count)
-			{
-				max_occurence = count;
-				result = strings[r_index][c_index];
-			}
-		}
-	}
-	if(result!=NULL) {
-		printf("string with most occurrences :%s",result);
-	}
-	else {
-		printf("no occurence found");
-	}
-
-	for(int index=0; index<rows; index++) {
-		for(int index2=0; index2<columns; index2++) {
-			free(strings[index][index2]);
-		}
-		free(strings[index]);
-	}
-	free(strings);
+    return 0;
 }
