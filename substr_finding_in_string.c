@@ -1,86 +1,124 @@
 #include <stdio.h>
 #include <stdlib.h>
-int length_of_string(char *string)
+int allocateMemory(int rows, int columns, char *names[rows][columns])
 {
-	int index = 0;
-	while (string[index] != '\0')
-	{
-		index++;
-	}
-	return index;
+
+    for (int iterator = 0; iterator < rows; iterator++)
+    {
+        for (int iterator2 = 0; iterator2 < columns; iterator2++)
+        {
+            names[iterator][iterator2] = (char *)malloc(100 * sizeof(char));
+            if (names[iterator][iterator2] == NULL)
+            {
+                printf("Memory allocation failed.\n");
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+void inputNames(int rows, int columns, char *names[rows][columns])
+{
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            printf("Enter name for row %d, column %d: ", row, column);
+            scanf("%s", names[row][column]);
+        }
+    }
+}
+void printNames(int rows, int columns, char *names[rows][columns])
+{
+    printf("The Names are:\n");
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            printf("%s ", names[row][column]);
+        }
+        printf("\n");
+    }
+}
+int isVowel(char character)
+{
+    return (character == 'A' || character == 'E' || character == 'I' || character == 'O' || character == 'U' ||
+            character == 'a' || character == 'e' || character == 'i' || character == 'o' || character == 'u');
+}
+int countNamesStartingWithVowels(int rows, int columns, char *names[rows][columns])
+{
+    int count = 0;
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            if (isVowel(names[row][column][0]))
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+char *findLongestName(int rows, int columns, char *names[rows][columns])
+{
+    char *longestName = NULL;
+    int maxLength = 0;
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            int length = 0;
+            for (int stringIterator = 0; names[row][column][stringIterator] != '\0'; stringIterator++)
+            {
+                length++;
+            }
+            if (length > maxLength)
+            {
+                maxLength = length;
+                longestName = names[row][column];
+            }
+        }
+    }
+    return longestName;
+}
+
+void freeMemory(int rows, int columns, char *names[rows][columns])
+{
+    for (int row = 0; row < rows; row++)
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            free(names[row][column]);
+        }
+    }
 }
 int main()
 {
-	int rows, columns;
-	printf("Enter Row and Column:");
-	scanf("%d%d", &rows, &columns);
-	char *strings[rows][columns];
-	for (int row = 0; row < rows; row++)
-	{
-		for (int column = 0; column < columns; column++)
-		{
-			strings[row][column] = (char *)malloc(100 * sizeof(char));
-		}
-	}
-	printf("Enter String:\n");
-	for (int row = 0; row < rows; row++)
-	{
-		for (int column = 0; column < columns; column++)
-		{
-			scanf("%s", strings[row][column]);
-		}
-	}
-	printf("Entered String:\n");
-	for (int row = 0; row < rows; row++)
-	{
-		for (int column = 0; column < columns; column++)
-		{
-			printf("%s ", strings[row][column]);
-		}
-		printf("\n");
-	}
-	char *substr = (char *)malloc(100 * sizeof(char));
-	printf("Enter the substring to check:");
-	scanf("%s", substr);
-	printf("Entered sub-string is : %s", substr);
-	int substr_length = length_of_string(substr);
-	int match_count = 0, match_flag = 0;
-	printf("\nThe matched string of substr '%s' is :", substr);
-	for (int row_index = 0; row_index < rows; row_index++)
-	{
-		for (int column_index = 0; column_index < columns; column_index++)
-		{
-			match_flag = 0;
-			int str_len = length_of_string(strings[row_index][column_index]);
-			for (int char_index = 0; char_index < str_len; char_index++)
-			{
+    int rows, columns;
+    printf("Enter Rows and Columns: ");
+    scanf("%d%d", &rows, &columns);
+    if (rows <= 0 || columns <= 0)
+    {
+        printf("Invalid Input");
+        return 0;
+    }
+    char *names[rows][columns];
+    if (!allocateMemory(rows, columns, names))
+    {
+        return 0;
+    }
 
-				int index = 0, match_flag_counter = 0;
+    inputNames(rows, columns, names);
+    printNames(rows, columns, names);
 
+    int vowelStartCount = countNamesStartingWithVowels(rows, columns, names);
+    printf("Number of names starting with vowels: %d\n", vowelStartCount);
 
-				while (index < substr_length  && substr[index] == strings[row_index][column_index][char_index + index])
-				{
-					index++;
-					match_flag_counter++;
-				}
+    char *longestName = findLongestName(rows, columns, names);
+    printf("Longest Name: %s\n", longestName);
 
-				if (match_flag_counter == substr_length)
-				{
-					printf("%s ", strings[row_index][column_index]);
-				        match_count++;
-					break;
-				}
-			}
-		}
-		printf("\n");
-	}
-	printf("Matched count: %d ", match_count);
-	free(substr);
-	for(int index=0; index<rows; index++) {
-		for(int index_col=0; index_col<columns; index_col++) {
-			free(strings[index][index_col]);
-		}
-
-	}
-	return 0;
+    freeMemory(rows, columns, names);
+    longestName = NULL;
+    return 0;
 }
