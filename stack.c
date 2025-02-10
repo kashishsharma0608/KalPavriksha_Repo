@@ -85,6 +85,7 @@ int main()
     {
         int choice;
         printf("\n1. Push onto stack\n2. Pop from stack\n3. Peek of stack\n4.size of stack\n5.Display Stack\n0. Exit");
+        printf("\n Enter a choice:\n");
         scanf("%d", &choice);
         if (choice == 1)
         {
@@ -99,7 +100,13 @@ int main()
         }
         else if (choice == 3)
         {
-            printf("Element at peek: %d\n", peek_of_stack(stack));
+            int peek_value=peek_of_stack(stack);
+            if(peek_value==-1){
+                printf("stack is empty");
+            }
+            else{
+                printf("Peek value: %d",peek_value);
+            }
         }
         else if (choice == 4)
         {
@@ -116,7 +123,7 @@ int main()
         }
         else
         {
-            printf("Invalid choice ! chosse between 1 to 5");
+            printf("Invalid choice ! choose between 1 to 5");
         }
     }
     return 0;
