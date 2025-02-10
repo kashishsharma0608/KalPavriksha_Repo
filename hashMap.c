@@ -10,7 +10,7 @@ typedef struct hashNode
 
 typedef struct hashMap
 {
-    int numOfElements;
+    int numberOfElements;
     hashNode **table;
 } hashMap;
 
@@ -21,7 +21,7 @@ int hashFunction(int key)
 
 void initializeHashMap(hashMap *map)
 {
-    map->numOfElements = 0;
+    map->numberOfElements = 0;
     map->table = (hashNode **)malloc(TABLE_SIZE * sizeof(hashNode *));
     for (int index = 0; index < TABLE_SIZE; index++)
     {
@@ -32,6 +32,10 @@ void initializeHashMap(hashMap *map)
 hashNode *createNode(int key, int value)
 {
     hashNode *newNode = (hashNode *)malloc(sizeof(hashNode));
+    if(!newNode){
+        printf("Memory Allocation Failed.\n");
+        return NULL;
+    }
     newNode->key = key;
     newNode->value = value;
     newNode->next = NULL;
@@ -55,7 +59,7 @@ void insert(hashMap *map, int key, int value)
     hashNode *newNode = createNode(key, value);
     newNode->next = map->table[index];
     map->table[index] = newNode;
-    map->numOfElements++;
+    map->numberOfElements++;
     printf("Inserted key %d with value %d.\n", key, value);
 }
 
