@@ -51,132 +51,90 @@ void freeMemory(evenOddSort **start) {
     }
     *start = NULL;
 }
-
-evenOddSort *sortOddList(evenOddSort *head) {
-    if (head == NULL || head->next == NULL) {
-        return head;
+evenOddSort *sortList(evenOddSort *listHead, int isAscending) {
+    if (listHead == NULL || listHead->next == NULL) {
+        return listHead;
     }
 
-    evenOddSort *sorted = NULL;
+    evenOddSort *sortedList = NULL;
 
-    while (head != NULL) {
-        evenOddSort *minNode = head;
-        evenOddSort *prevMin = NULL;
-        evenOddSort *curr = head;
-        evenOddSort *prev = NULL;
-        while (curr != NULL) {
-            if (curr->data > minNode->data) {
-                minNode = curr;
-                prevMin = prev;
+    while (listHead != NULL) {
+        evenOddSort *extremeNode = listHead;
+        evenOddSort *previousExtremeNode = NULL;
+        evenOddSort *currentNode = listHead;
+        evenOddSort *previousNode = NULL;
+
+        while (currentNode != NULL) {
+            if ((isAscending && currentNode->data < extremeNode->data) || 
+                (!isAscending && currentNode->data > extremeNode->data)) {
+                extremeNode = currentNode;
+                previousExtremeNode = previousNode;
             }
-            prev = curr;
-            curr = curr->next;
+            previousNode = currentNode;
+            currentNode = currentNode->next;
         }
 
-        if (minNode == head) {
-            head = head->next;
+        if (extremeNode == listHead) {
+            listHead = listHead->next;
         } else {
-            prevMin->next = minNode->next;
+            previousExtremeNode->next = extremeNode->next;
         }
 
-        minNode->next = sorted;
-        sorted = minNode;
+        extremeNode->next = sortedList;
+        sortedList = extremeNode;
+    }
+    evenOddSort *previousNode = NULL;
+    evenOddSort *currentNode = sortedList;
+    while (currentNode != NULL) {
+        evenOddSort *nextNode = currentNode->next;
+        currentNode->next = previousNode;
+        previousNode = currentNode;
+        currentNode = nextNode;
     }
 
-    evenOddSort *prev = NULL;
-    evenOddSort *curr = sorted;
-    while (curr != NULL) {
-        evenOddSort *next = curr->next;
-        curr->next = prev;
-        prev = curr;
-        curr = next;
-    }
-
-    return prev;
+    return previousNode;
 }
 
-evenOddSort *sortEvenList(evenOddSort *head) {
-    if (head == NULL || head->next == NULL) {
-        return head;
-    }
-
-    evenOddSort *sorted = NULL;
-
-    while (head != NULL) {
-        evenOddSort *minNode = head;
-        evenOddSort *prevMin = NULL;
-        evenOddSort *curr = head;
-        evenOddSort *prev = NULL;
-        while (curr != NULL) {
-            if (curr->data < minNode->data) {
-                minNode = curr;
-                prevMin = prev;
-            }
-            prev = curr;
-            curr = curr->next;
-        }
-
-        if (minNode == head) {
-            head = head->next;
-        } else {
-            prevMin->next = minNode->next;
-        }
-
-        minNode->next = sorted;
-        sorted = minNode;
-    }
-
-    evenOddSort *prev = NULL;
-    evenOddSort *curr = sorted;
-    while (curr != NULL) {
-        evenOddSort *next = curr->next;
-        curr->next = prev;
-        prev = curr;
-        curr = next;
-    }
-
-    return prev;
-}
 
 evenOddSort *sortEvenOdd(evenOddSort *head) {
     evenOddSort *evenList = NULL, *evenListTail = NULL, *oddList = NULL, *oddListTail = NULL;
     evenOddSort *temp = head;
     
     while (temp != NULL) {
-        if (temp->data % 2 == 0) {
+        if (temp->data % 2 == 0) {  // Even number
             if (evenList == NULL) {
-                evenList = temp;
-                evenListTail = temp;
+                evenList = evenListTail = temp;
             } else {
                 evenListTail->next = temp;
-                evenListTail = evenListTail->next;
+                evenListTail = temp;
             }
-        } else {
+        } else {  // Odd number
             if (oddList == NULL) {
-                oddList = temp;
-                oddListTail = temp;
+                oddList = oddListTail = temp;
             } else {
                 oddListTail->next = temp;
-                oddListTail = oddListTail->next;
+                oddListTail = temp;
             }
         }
         temp = temp->next;
     }
+
+    
     if (evenListTail != NULL) evenListTail->next = NULL;
     if (oddListTail != NULL) oddListTail->next = NULL;
-
-    evenList = sortEvenList(evenList);
-    oddList = sortOddList(oddList);
-
+    evenList = sortList(evenList, 1);  
+    oddList = sortList(oddList, 0);  
     head = oddList;
-
     evenOddSort *temporary = head;
+    
     while (temporary != NULL && temporary->next != NULL) {
         temporary = temporary->next;
     }
     
     if (temporary != NULL) {
         temporary->next = evenList;
+    } else {
+        head = evenList;
     }
 
     return head;
