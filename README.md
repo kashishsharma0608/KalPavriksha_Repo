@@ -10,9 +10,6 @@ Print a single integer, the Kth smallest element in the list.
 
 Example
 Input:
-
-Copy
-Edit
 5
 7
 3
@@ -21,9 +18,6 @@ Edit
 5
 3
 Output:
-
-Copy
-Edit
 5
 Explanation
 The linked list is created with elements: 7 -> 3 -> 10 -> 1 -> 5.
