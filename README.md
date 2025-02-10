@@ -1,6 +1,6 @@
 Problem Description:
 In a magical world, Harry Potter is on a quest to find a pair of nodes from a mystical tree (represented by a Doubly Linked List) whose sum of values is equal to a given harryPower. Harry Potter is searching for pairs of nodes from both ends of the tree, and when a valid pair is found, it is displayed.
-
+NOTE: list is always sorted.
 Input:
 numberOfMysticTrees (N): The number of nodes in the Doubly Linked List (1 ≤ N ≤ 10^5).
 Nodes: A sequence of N integers, each representing the data stored in a node of the tree.
