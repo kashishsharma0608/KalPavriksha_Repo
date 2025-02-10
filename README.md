@@ -33,3 +33,4 @@ total - o(n*log(sum))- for each numberof painters n sum caluclation is done.
 
 Space complexity
 To store the nodes it takes N spaces.
+so space complexity is  : O(N)
