@@ -1,127 +1,118 @@
 #include <stdio.h>
 #include <stdlib.h>
-struct node
-{
+
+struct node {
     int data;
     struct node *prev;
     struct node *next;
 };
-struct node *createNode(int value)
-{
+
+struct node *createNode(int value) {
     struct node *newNode = (struct node *)malloc(sizeof(struct node));
-    if (!newNode)
-    {
+    if (!newNode) {
         printf("Allocation failed!");
-        return 0;
+        return NULL;
     }
     newNode->data = value;
     newNode->next = NULL;
     newNode->prev = NULL;
     return newNode;
 }
-void createDoublyLinkedList(struct node **head, int value)
-{
+
+void createDoublyLinkedList(struct node **head, int value) {
     struct node *newNode = createNode(value);
-    if (*head == NULL)
-    {
-        *head = newNode;
+    if (!newNode) {
+        return;
     }
-    else
-    {
-        struct node *ptr = *head;
-        while (ptr->next != NULL)
-        {
-            ptr = ptr->next;
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct node *current = *head;
+        while (current->next != NULL) {
+            current = current->next;
         }
-        ptr->next = newNode;
-        newNode->prev = ptr;
+        current->next = newNode;
+        newNode->prev = current;
     }
 }
-void display(struct node *head)
-{
-    if (head == NULL)
-    {
+
+void display(struct node *head) {
+    if (head == NULL) {
         printf("List is empty");
         return;
     }
-    while (head != NULL)
-    {
+    while (head != NULL) {
         printf("%d ", head->data);
         head = head->next;
     }
 }
-void findHarryMysticTree(struct node *head, int harryPower)
-{
-    if (head == NULL)
-    {
+
+void findMysticPair(struct node *head, int targetSum) {
+    if (head == NULL || head->next == NULL) {
+        printf("No Mystic Tree found");
         return;
     }
+    
     struct node *tail = head;
-    int found = 0;
-    while (tail->next != NULL)
-    {
+    while (tail->next != NULL) {
         tail = tail->next;
     }
-    while (head != tail && tail->next != head)
-    {
+
+    int found = 0;
+    while (head != tail && tail->next != head) {
         int sum = head->data + tail->data;
-        if (sum > harryPower)
-        {
+        if (sum > targetSum) {
             tail = tail->prev;
-        }
-        else if (sum < harryPower)
-        {
+        } else if (sum < targetSum) {
             head = head->next;
-        }
-        else if (sum == harryPower)
-        {
-            printf("Mystic Pair:");
-            printf("(%d,%d)\n", head->data, tail->data);
+        } else {
+            printf("Mystic Pair: (%d,%d)\n", head->data, tail->data);
             found = 1;
             head = head->next;
             tail = tail->prev;
         }
     }
-    if (found == 0)
-    {
+    
+    if (!found) {
         printf("No Mystic Tree found");
     }
 }
-void freeMemory(struct node **start)
-{
-    struct node *temp;
-    while (*start != NULL)
-    {
-        temp = *start;
-        free(temp);
-        *start = (*start)->next;
+
+void freeMemory(struct node **head) {
+    struct node *current = *head;
+    while (current != NULL) {
+        struct node *nextNode = current->next;
+        free(current);
+        current = nextNode;
     }
-    *start = NULL;
+    *head = NULL;
 }
-int main()
-{
+
+int main() {
     struct node *head = NULL;
-    int numberOfMysticTrees;
-    scanf("%d", &numberOfMysticTrees);
-    if (numberOfMysticTrees <= 0)
-    {
-        printf("Enter the positive value or atleast 1 node");
+    int numNodes;
+    
+    scanf("%d", &numNodes);
+    if (numNodes <= 0) {
+        printf("Enter a positive value or at least 1 node");
         return 0;
     }
-    for (int iterator = 0; iterator < numberOfMysticTrees; iterator++)
-    {
+    
+    for (int i = 0; i < numNodes; i++) {
         int value;
         scanf("%d", &value);
         createDoublyLinkedList(&head, value);
     }
-    if (numberOfMysticTrees == 1)
-    {
+
+    if (numNodes == 1) {
         display(head);
         return 0;
     }
-    int harryPower;
-    scanf("%d", &harryPower);
-    findHarryMysticTree(head, harryPower);
+
+    int targetSum;
+    scanf("%d", &targetSum);
+    findMysticPair(head, targetSum);
     freeMemory(&head);
+    
     return 0;
 }
