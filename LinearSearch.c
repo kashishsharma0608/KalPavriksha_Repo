@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 typedef struct coachAvailability
 {
     char coachName[100];
     int availability;
     struct coachAvailability *next;
 } coachAvailability;
+
 int stringLength(char *string)
 {
     int length = 0;
@@ -15,24 +17,6 @@ int stringLength(char *string)
         length++;
     }
     return length;
-}
-int stringCompare(char *string1, char *string2)
-{
-    if (stringLength(string1) != stringLength(string2))
-    {
-        return 1;
-    }
-    int iterator = 0;
-    while (string1[iterator] != '\0' && string2[iterator] != '\0')
-    {
-        if (string1[iterator] != string2[iterator])
-        {
-            return 1;
-        }
-        iterator++;
-    }
-
-    return 0;
 }
 void stringCopy(char destination[], char source[])
 {
@@ -44,12 +28,40 @@ void stringCopy(char destination[], char source[])
     }
     destination[index] = '\0';
 }
+
+char toLower(char character)
+{
+    if (character >= 'A' && character <= 'Z')
+    {
+        return character + ('a' - 'A');
+    }
+    return character;
+}
+
+int stringCaseCompare(char *string1, char *string2)
+{
+    while (*string1 != '\0' || *string2 != '\0')
+    {
+        char c1 = toLower(*string1);
+        char c2 = toLower(*string2);
+
+        if (c1 != c2)
+        {
+            return (c1 - c2);
+        }
+
+        string1++;
+        string2++;
+    }
+    return 0;
+}
+
 coachAvailability *createNode(char *coachName, int availability)
 {
     coachAvailability *newNode = (coachAvailability *)malloc(sizeof(coachAvailability));
     if (!newNode)
     {
-        printf("Memory Alloaction failed");
+        printf("Memory Allocation failed");
         return NULL;
     }
     stringCopy(newNode->coachName, coachName);
@@ -57,6 +69,7 @@ coachAvailability *createNode(char *coachName, int availability)
     newNode->next = NULL;
     return newNode;
 }
+
 void createLinkedList(coachAvailability **start, char *coachName, int availability)
 {
     coachAvailability *newNode = createNode(coachName, availability);
@@ -78,38 +91,38 @@ void createLinkedList(coachAvailability **start, char *coachName, int availabili
         pointer->next = newNode;
     }
 }
+
 void displayCoachList(coachAvailability *start)
 {
     if (start == NULL)
     {
-        printf("No coach List found");
+        printf("No coach List found\n");
         return;
     }
     while (start != NULL)
     {
-        printf("Coach name :%s ", start->coachName);
-        printf("Availability :%d ", start->availability);
-        printf("\n");
+        printf("Coach name: %s | Availability: %d\n", start->coachName, start->availability);
         start = start->next;
     }
 }
-void chechCoachAvailability(coachAvailability *start, char *coachNameToFind)
+
+void checkCoachAvailability(coachAvailability *start, char *coachNameToFind)
 {
     int found = 0;
     if (start == NULL)
     {
-        printf("No Coach Found");
+        printf("No Coach Found\n");
         return;
     }
     while (start != NULL)
     {
-        if ((stringCompare(start->coachName, coachNameToFind) == 0))
+        if (stringCaseCompare(start->coachName, coachNameToFind) == 0)
         {
             found = 1;
             if (start->availability == 0)
             {
                 start->availability = 1;
-                printf("Congratulation! You have been assigned %s for training.", start->coachName);
+                printf("Congratulations! You have been assigned %s for training.\n", start->coachName);
                 return;
             }
         }
@@ -117,19 +130,19 @@ void chechCoachAvailability(coachAvailability *start, char *coachNameToFind)
     }
     if (found == 0)
     {
-        printf("sorry ! %s is not in our database.", coachNameToFind);
-        return;
+        printf("Sorry! %s is not in our database.\n", coachNameToFind);
     }
-    if (start == NULL)
+    else
     {
-        printf("Sorry ! The coach asked is not available.");
+        printf("Sorry! The coach asked is not available.\n");
     }
 }
+
 void checkAnyCoachAvailability(coachAvailability *start)
 {
     if (start == NULL)
     {
-        printf("No Coach Found");
+        printf("No Coach Found\n");
         return;
     }
     while (start != NULL)
@@ -137,63 +150,69 @@ void checkAnyCoachAvailability(coachAvailability *start)
         if (start->availability == 0)
         {
             start->availability = 1;
-            printf("Congratulation! You have been assigned %s for training.", start->coachName);
+            printf("Congratulations! You have been assigned %s for training.\n", start->coachName);
             return;
         }
         start = start->next;
     }
-    if (start == NULL)
-    {
-        printf("Sorry ! No coach is available.");
-    }
+    printf("Sorry! No coach is available.\n");
 }
+
 void freeMemory(coachAvailability **start)
 {
     coachAvailability *temp;
     while (*start != NULL)
     {
         temp = *start;
-        free(temp);
         *start = (*start)->next;
+        free(temp);
     }
     *start = NULL;
 }
+
 int main()
 {
     coachAvailability *head = NULL;
     int numberOfCoaches;
-    printf("Enter the number of coaches in academy:");
+
+    printf("Enter the number of coaches in the academy:\n");
     scanf("%d", &numberOfCoaches);
-    if (numberOfCoaches <= 0)
+    if (numberOfCoaches < 0)
     {
-        printf("Sorry! no coach in the academy");
+        printf("Enter non-negative number:\n");
+        scanf("%d", &numberOfCoaches);
+    }
+    if (numberOfCoaches == 0)
+    {
+        printf("Sorry! No coach in the academy.\n");
         return 0;
     }
-    for (int iterator = 0; iterator < numberOfCoaches; iterator++)
+
+    for (int i = 0; i < numberOfCoaches; i++)
     {
         char coachName[100];
         int availability;
-        printf("Enter the name of the coach :");
+        printf("Enter the name of the coach: ");
         getchar();
-        scanf("%[^\n]", coachName);
-        getchar();
-        printf("Enter the availability:");
+        scanf(" %[^\n]", coachName);
+        printf("Enter the availability (0 for available, 1 for unavailable):");
         scanf("%d", &availability);
         createLinkedList(&head, coachName, availability);
     }
-    do
+
+    while (1)
     {
-        printf("\nEnter \n 1. Check for the coach Availability by Name. \n 2. Display Coach List.\n 3. Check for any coach availability. \n 0. To exit the program\n Enter your choice:\n");
+        printf("\nEnter:\n 1. Check for the coach availability by name\n 2. Display Coach List\n 3. Check for any coach availability\n 0. To exit the program\nEnter your choice: ");
         int choice;
         scanf("%d", &choice);
+
         if (choice == 1)
         {
-            printf("enter the name of the coach you want: ");
+            printf("Enter the name of the coach you want: ");
             getchar();
-            char *coachNameToFind = (char *)malloc(100 * sizeof(char));
+            char coachNameToFind[100];
             scanf("%[^\n]", coachNameToFind);
-            getchar();
-            chechCoachAvailability(head, coachNameToFind);
+            checkCoachAvailability(head, coachNameToFind);
         }
         else if (choice == 2)
         {
@@ -206,14 +225,14 @@ int main()
         }
         else if (choice == 0)
         {
-            printf("Thank You!");
-            return 0;
+            printf("Thank You!\n");
+            break;
         }
         else
         {
-            printf("please enter choice between 1 to 3 or 0 for exit.");
+            printf("Please enter a choice between 1 to 3 or 0 for exit.\n");
         }
-    } while (1);
+    }
     freeMemory(&head);
     return 0;
 }
