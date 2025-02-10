@@ -1,182 +1,198 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 typedef struct library
 {
-    char title[100];
-    struct library *next;
+	char title[100];
+	struct library *next;
 } library;
+
 int stringLength(char *string)
 {
-    int length = 0;
-    while (string[length] != '\0')
-    {
-        length++;
-    }
-    return length;
+	int length = 0;
+	while (string[length] != '\0')
+	{
+		length++;
+	}
+	return length;
 }
+
 int stringCompare(char *string1, char *string2)
 {
-    int iterator = 0;
-    while (string1[iterator] != '\0' && string2[iterator] != '\0')
-    {
-        if (string1[iterator] < string2[iterator])
-            return -1;
-        if (string1[iterator] > string2[iterator])
-            return 1;
-        iterator++;
-    }
-    return string1[iterator] - string2[iterator];
+	int index = 0;
+	while (string1[index] != '\0' && string2[index] != '\0')
+	{
+		if (string1[index] < string2[index])
+			return -1;
+		if (string1[index] > string2[index])
+			return 1;
+		index++;
+	}
+	return string1[index] - string2[index];
 }
+
 void stringCopy(char destination[], char source[])
 {
-    int index = 0;
-    while (source[index] != '\0')
-    {
-        destination[index] = source[index];
-        index++;
-    }
-    destination[index] = '\0';
+	int index = 0;
+	while (source[index] != '\0')
+	{
+		destination[index] = source[index];
+		index++;
+	}
+	destination[index] = '\0';
 }
+
 library *createNode(char *bookTitle)
 {
-    library *newNode = (library *)malloc(sizeof(library));
-    if (!newNode)
-    {
-        printf("Allocation failed!");
-        return NULL;
-    }
-    stringCopy(newNode->title, bookTitle);
-    newNode->next = NULL;
-    return newNode;
+	library *newBook = (library *)malloc(sizeof(library));
+	if (!newBook)
+	{
+		printf("Allocation failed!");
+		return NULL;
+	}
+	stringCopy(newBook->title, bookTitle);
+	newBook->next = NULL;
+	return newBook;
 }
 
 void createLinkedList(library **head, char *bookTitle)
 {
-    library *newNode = createNode(bookTitle);
-    if (*head == NULL)
-    {
-        *head = newNode;
-    }
-    else
-    {
-        library *ptr = *head;
-        while (ptr->next != NULL)
-        {
-            ptr = ptr->next;
-        }
-        ptr->next = newNode;
-    }
+	library *newBook = createNode(bookTitle);
+	if (*head == NULL)
+	{
+		*head = newBook;
+	}
+	else
+	{
+		library *currentBook = *head;
+		while (currentBook->next != NULL)
+		{
+			currentBook = currentBook->next;
+		}
+		currentBook->next = newBook;
+	}
 }
 
 void display(library *head)
 {
-    if (head == NULL)
-    {
-        printf("List is empty");
-        return;
-    }
-    while (head != NULL)
-    {
-        printf("%s ", head->title);
-        head = head->next;
-    }
-    printf("\n");
+	if (head == NULL)
+	{
+		printf("List is empty");
+		return;
+	}
+	while (head != NULL)
+	{
+		printf("%s\n", head->title);
+		head = head->next;
+	}
+	printf("\n");
 }
 
-void freeMemory(library **start)
+void freeMemory(library **head)
 {
-    library *temp;
-    while (*start != NULL)
-    {
-        temp = *start;
-        *start = (*start)->next;
-        free(temp);
-    }
-    *start = NULL;
-}
-void splitList(library *start, library **bookListOne, library **bookListTwo)
-{
-    library *slow = start, *fast = start->next;
-    while (fast != NULL)
-    {
-        fast = fast->next;
-        if (fast != NULL)
-        {
-            slow = slow->next;
-            fast = fast->next;
-        }
-    }
-    *bookListOne = start;
-    *bookListTwo = slow->next;
-    slow->next = NULL;
+	library *tempBook;
+	while (*head != NULL)
+	{
+		tempBook = *head;
+		*head = (*head)->next;
+		free(tempBook);
+	}
+	*head = NULL;
 }
 
-library *mergeSortedList(library *bookListOne, library *bookListTwo)
+void splitList(library *head, library **firstHalf, library **secondHalf)
 {
-    if (bookListOne == NULL)
-        return bookListTwo;
-    if (bookListTwo == NULL)
-        return bookListOne;
+	library *slow = head, *fast = head->next;
+	while (fast != NULL)
+	{
+		fast = fast->next;
+		if (fast != NULL)
+		{
+			slow = slow->next;
+			fast = fast->next;
+		}
+	}
+	*firstHalf = head;
+	*secondHalf = slow->next;
+	slow->next = NULL;
+}
 
-    library *bookLib = NULL;
-    if (stringCompare(bookListOne->title, bookListTwo->title) <= 0)
-    {
-        bookLib = bookListOne;
-        bookLib->next = mergeSortedList(bookListOne->next, bookListTwo);
-    }
-    else
-    {
-        bookLib = bookListTwo;
-        bookLib->next = mergeSortedList(bookListOne, bookListTwo->next);
-    }
-    return bookLib;
+library *mergeSortedList(library *firstHalf, library *secondHalf)
+{
+	if (firstHalf == NULL)
+		return secondHalf;
+	if (secondHalf == NULL)
+		return firstHalf;
+
+	library *mergedList = NULL;
+	if (stringCompare(firstHalf->title, secondHalf->title) <= 0)
+	{
+		mergedList = firstHalf;
+		mergedList->next = mergeSortedList(firstHalf->next, secondHalf);
+	}
+	else
+	{
+		mergedList = secondHalf;
+		mergedList->next = mergeSortedList(firstHalf, secondHalf->next);
+	}
+	return mergedList;
 }
 
 void mergeSort(library **head)
 {
-    library *newHead = *head;
-    if (newHead == NULL || newHead->next == NULL)
-    {
-        return;
-    }
+	library *currentHead = *head;
+	if (currentHead == NULL || currentHead->next == NULL)
+	{
+		return;
+	}
 
-    library *bookListOne, *bookListTwo;
-    splitList(newHead, &bookListOne, &bookListTwo);
-    mergeSort(&bookListOne);
-    mergeSort(&bookListTwo);
-    *head = mergeSortedList(bookListOne, bookListTwo);
+	library *firstHalf, *secondHalf;
+	splitList(currentHead, &firstHalf, &secondHalf);
+	mergeSort(&firstHalf);
+	mergeSort(&secondHalf);
+	*head = mergeSortedList(firstHalf, secondHalf);
 }
 
 int main()
 {
-    library *start = NULL;
-    int numberOfNodes;
+	library *head = NULL;
+	int numberOfBooks;
 
-    printf("Enter the number of nodes: ");
-    scanf("%d", &numberOfNodes);
+	printf("Enter the number of books: ");
+	scanf("%d", &numberOfBooks);
 
-    if (numberOfNodes <= 0)
-    {
-        printf("Invalid Input");
-        return 0;
-    }
+	if (numberOfBooks <= 0)
+	{
+		printf("Invalid Input");
+		return 0;
+	}
 
-    for (int iterator = 0; iterator < numberOfNodes; iterator++)
-    {
-        char *bookTitle = (char *)malloc(100 * sizeof(char));
-        scanf("%s", bookTitle);
-        getchar();
-        createLinkedList(&start, bookTitle);
-    }
+	for (int i = 0; i < numberOfBooks; i++)
+	{
+		char *bookTitle = (char *)malloc(100 * sizeof(char));
+		if (bookTitle == NULL)
+		{
+			printf("Memory allocation failed\n");
+			return 0;
+		}
+		printf("Enter book title:\n");
+		scanf(" %[^\n]", bookTitle);
+		createLinkedList(&head, bookTitle);
+		free(bookTitle);
+	}
 
-    if (numberOfNodes == 1)
-    {
-        display(start);
-        return 0;
-    }
-    display(start);
-    mergeSort(&start);
-    display(start);
-    freeMemory(&start);
-    return 0;
+	if (numberOfBooks == 1)
+	{
+	    printf("List :");
+		display(head);
+		freeMemory(&head);
+		return 0;
+	}
+    printf("List before sorting:\n");
+	display(head);
+	mergeSort(&head);
+	printf("List After sorting:\n");
+	display(head);
+	freeMemory(&head);
+	return 0;
 }
