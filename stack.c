@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
 #define MAX 100
 
 int isEmpty(int front)
 {
     return (front == -1);
 }
+
 void push(int capacity, int queue[], int *front, int *rear, int value)
 {
     if ((*rear + 1) % capacity == *front)
@@ -24,15 +24,6 @@ void push(int capacity, int queue[], int *front, int *rear, int value)
     }
 
     queue[*rear] = value;
-
-    int size = (*rear - *front + capacity) % capacity + 1;
-    for (int index = 0; index < size - 1; index++)
-    {
-        int temp = queue[*front];
-        *front = (*front + 1) % capacity;
-        *rear = (*rear + 1) % capacity;
-        queue[*rear] = temp;
-    }
 }
 
 int pop(int capacity, int queue[], int *front, int *rear)
@@ -43,37 +34,39 @@ int pop(int capacity, int queue[], int *front, int *rear)
         return -1;
     }
 
-    int poppedElement = queue[*front];
+    int poppedElement = queue[*rear];
 
     if (*front == *rear)
     {
         *front = -1;
         *rear = -1;
     }
+    else if (*rear == 0)
+    {
+        *rear = capacity - 1;
+    }
     else
     {
-        *front = (*front + 1) % capacity;
+        (*rear)--;
     }
 
     return poppedElement;
 }
 
-int top(int front, int queue[])
+int top(int rear, int queue[])
 {
-    if (isEmpty(front))
+    if (rear == -1)
     {
         printf("Stack is empty!\n");
         return -1;
     }
-    return queue[front];
+    return queue[rear];
 }
 
 int size(int front, int rear, int capacity)
 {
-    if (isEmpty(front))
-    {
+    if (front == -1)
         return 0;
-    }
     return (rear - front + capacity) % capacity + 1;
 }
 
@@ -85,13 +78,14 @@ void display(int queue[], int front, int rear, int capacity)
         return;
     }
 
-    int index = front;
+    printf("Stack (top to bottom): ");
+    int index = rear;
     while (1)
     {
         printf("%d ", queue[index]);
-        if (index == rear)
+        if (index == front)
             break;
-        index = (index + 1) % capacity;
+        index = (index - 1 + capacity) % capacity;
     }
     printf("\n");
 }
@@ -106,6 +100,11 @@ int main()
 
     int numberOfOperations;
     printf("Enter the number of operations: ");
+    while (numberOfOperations < 0)
+    {
+        printf("Enter a non-negative number Of Operations:\n");
+        scanf("%d", &numberOfOperations);
+    }
     scanf("%d", &numberOfOperations);
 
     for (int index = 0; index < numberOfOperations; index++)
@@ -131,7 +130,7 @@ int main()
         }
         else if (choice == 3)
         {
-            int topElement = top(front, queue);
+            int topElement = top(rear, queue);
             if (topElement != -1)
             {
                 printf("Top element: %d\n", topElement);
